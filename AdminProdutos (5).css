@@ -36,5 +36,6 @@
 .admin-produto-acoes button:hover { border-color: #df3e80; }
 .admin-produto-acoes .perigo { color: #c62828; }
 @media (max-width: 700px) { .admin-form { grid-template-columns: 1fr; } .admin-campo-grande, .admin-arquivo, .admin-erro, .admin-sucesso, .admin-salvar { grid-column: auto; } .admin-produto { align-items: flex-start; flex-wrap: wrap; } .admin-produto-acoes { width: 100%; } .admin-produto-acoes button { flex: 1; justify-content: center; } }
-
-.admin-estado{min-height:45vh;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px}.admin-estado h1{margin:0}.admin-estado p{margin:0 0 12px;color:#666}
+.admin-estado { min-height: 45vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; }
+.admin-estado h1 { margin: 0; }
+.admin-estado p { margin: 0 0 12px; color: #666; }
