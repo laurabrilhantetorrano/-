@@ -3,142 +3,128 @@ import { Autoplay } from "swiper/modules";
 import { CircleUserRound, ShoppingCart, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import "swiper/css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Inicio.css";
 import { useCarrinho } from "./CarrinhoContext";
+import { useAuth } from "./AuthContext";
+import { apiFetch, formatarPreco, normalizarImagem } from "./api";
 
 import slider1 from "./assets/slider1.png";
 import slider2 from "./assets/slider2.png";
-import produto1 from "./assets/produto1.png";
-import produto2 from "./assets/produto2.png";
-import produto3 from "./assets/produto3.png";
-import produto4 from "./assets/produto4.png";
-import produto5 from "./assets/produto5.jpeg";
-import produto6 from "./assets/produto6.jpeg";
-import produto7 from "./assets/produto7.jpeg";
-import produto8 from "./assets/produto8.jpeg";
 import logo from "./assets/logo.jpg";
-
-const listaProdutos = [
-  // Primeira fileira
-  {
-    id: 1,
-    img: produto1,
-    nome: "Body + Corpete Bege",
-    preco: "R$ 105,00"
-  },
-  {
-    id: 2,
-    img: produto2,
-    nome: "Camisa Social",
-    preco: "R$ 59,90",
-    precoAntigo: "R$ 119,90"
-  },
-  {
-    id: 3,
-    img: produto3,
-    nome: "Calça Jogger",
-    preco: "R$ 89,90"
-  },
-  {
-    id: 4,
-    img: produto4,
-    nome: "Moletom Cinza",
-    preco: "R$ 85,00"
-  },
-
-  // Segunda fileira
-  {
-    id: 5,
-    img: produto5,
-    nome: "Blusa feminina",
-    preco: "R$ 42,00"
-  },
-  {
-    id: 6,
-    img: produto6,
-    nome: "Conjunto Verão",
-    preco: "R$ 135,00"
-  },
-  {
-    id: 7,
-    img: produto7,
-    nome: "Pijama Infantil Sereia",
-    preco: "R$ 65,00"
-  },
-  {
-    id: 8,
-    img: produto8,
-    nome: "Pijama Infantil Sweet Dreams",
-    preco: "R$ 69,00"
-  }
-];
 
 export default function Inicio() {
   const { carrinho } = useCarrinho();
+  const { isLogado } = useAuth();
   const [termoBusca, setTermoBusca] = useState("");
+  const [produtos, setProdutos] = useState([]);
+  const [carregandoProdutos, setCarregandoProdutos] = useState(true);
+  const [erroProdutos, setErroProdutos] = useState("");
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarProdutos() {
+      try {
+        setCarregandoProdutos(true);
+        const data = await apiFetch('/products');
+
+        if (ativo) {
+          setProdutos((data || []).map((produto) => ({
+            ...produto,
+            id: Number(produto.id),
+            preco: Number(produto.preco),
+            preco_antigo: produto.preco_antigo == null ? null : Number(produto.preco_antigo),
+            imagem: normalizarImagem(produto.imagem),
+          })));
+          setErroProdutos("");
+        }
+      } catch (erro) {
+        console.error(erro);
+        if (ativo) setErroProdutos("Não foi possível carregar os produtos.");
+      } finally {
+        if (ativo) setCarregandoProdutos(false);
+      }
+    }
+
+    carregarProdutos();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   const totalItens = carrinho.reduce(
-    (acc, item) => acc + item.quantidade,
+    (acc, item) => acc + Number(item.quantidade || 0),
     0
   );
 
-  // Filtra produtos ignorando maiúsculas/minúsculas
-  const produtosFiltrados = listaProdutos.filter((produto) =>
-    produto.nome.toLowerCase().includes(termoBusca.toLowerCase())
+  const produtosFiltrados = produtos.filter((produto) =>
+    String(produto.nome || "").toLowerCase().includes(termoBusca.toLowerCase())
+  );
+
+  const renderCard = (item) => (
+    <div
+      key={item.id}
+      className="card-wrapper"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
+      }}
+    >
+      <Link
+        to={`/produto/${item.id}`}
+        className="card-link"
+        style={{
+          textDecoration: "none",
+          color: "inherit",
+          width: "100%"
+        }}
+      >
+        <div className="card">
+          {item.imagem ? (
+            <img src={item.imagem} alt={item.nome} />
+          ) : (
+            <div style={{ height: 250, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              Sem imagem
+            </div>
+          )}
+
+          <p className="nome">{item.nome}</p>
+
+          <p className="preco-antigo">
+            {item.preco_antigo ? <del>{formatarPreco(item.preco_antigo)}</del> : null}
+          </p>
+
+          <p className="preco">{formatarPreco(item.preco)}</p>
+        </div>
+      </Link>
+    </div>
   );
 
   return (
     <div className="app">
-
-      {/* BARRA DE NAVEGAÇÃO */}
       <div className="navbar">
-
         <Link to="/">
-          <img
-            src={logo}
-            alt="Logo"
-            className="logo"
-          />
+          <img src={logo} alt="Logo" className="logo" />
         </Link>
 
         <div className="menu">
-
-          <Link
-            to="/sobre-nos"
-            style={{
-              textDecoration: "none",
-              color: "inherit"
-            }}
-          >
+          <Link to="/sobre-nos" style={{ textDecoration: "none", color: "inherit" }}>
             <span>Sobre nós</span>
           </Link>
 
-          <Link
-            to="/contato"
-            style={{
-              textDecoration: "none",
-              color: "inherit"
-            }}
-          >
+          <Link to="/contato" style={{ textDecoration: "none", color: "inherit" }}>
             <span>Contato</span>
           </Link>
 
-          <Link
-            to="/"
-            style={{
-              textDecoration: "none",
-              color: "inherit"
-            }}
-          >
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
             <span>Roupas</span>
           </Link>
-
         </div>
 
-        {/* PESQUISA */}
         <div className="container-pesquisa">
-
           <input
             type="text"
             placeholder="Buscar produto..."
@@ -146,32 +132,22 @@ export default function Inicio() {
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
           />
-
-          <Search
-            size={18}
-            className="icone-lupa"
-          />
-
+          <Search size={18} className="icone-lupa" />
         </div>
 
-        {/* ÍCONES */}
         <div className="icons">
-
           <Link
-            to="/login"
+            to={isLogado ? "/minha-conta" : "/login"}
             style={{ color: "inherit" }}
+            title={isLogado ? "Minha conta" : "Entrar"}
           >
             <CircleUserRound size={30} />
           </Link>
 
           <Link
             to="/carrinho"
-            style={{
-              color: "inherit",
-              position: "relative"
-            }}
+            style={{ color: "inherit", position: "relative" }}
           >
-
             <ShoppingCart size={30} />
 
             {totalItens > 0 && (
@@ -191,57 +167,41 @@ export default function Inicio() {
                 {totalItens}
               </span>
             )}
-
           </Link>
-
         </div>
-
       </div>
 
-      {/* BANNER */}
       <div className="banner">
-
         <Swiper
           modules={[Autoplay]}
           slidesPerView={1}
           autoplay={{ delay: 3000 }}
           loop={true}
         >
-
           <SwiperSlide>
-            <img
-              src={slider1}
-              alt="slider1"
-            />
+            <img src={slider1} alt="slider1" />
           </SwiperSlide>
 
           <SwiperSlide>
-            <img
-              src={slider2}
-              alt="slider2"
-            />
+            <img src={slider2} alt="slider2" />
           </SwiperSlide>
-
         </Swiper>
-
       </div>
 
-      {/* BARRA DE FRETE */}
       <div className="info-barra">
-
         <div>💳 Parcele em até 12x</div>
-
         <div>🚛 Frete grátis acima de R$199</div>
-
         <div>🛡️ Site seguro</div>
-
         <div>🎯 Produto de qualidade</div>
-
       </div>
 
-      {/* EXIBIÇÃO DOS PRODUTOS */}
-      {termoBusca.trim() !== "" ? (
-        // EXIBE RESULTADOS DA BUSCA
+      {carregandoProdutos ? (
+        <p style={{ textAlign: "center", padding: "40px" }}>Carregando produtos...</p>
+      ) : erroProdutos ? (
+        <p style={{ textAlign: "center", padding: "40px", color: "#b00020" }}>
+          {erroProdutos}
+        </p>
+      ) : termoBusca.trim() !== "" ? (
         <>
           <h2 className="titulo-fileira">
             Resultados para "{termoBusca}"
@@ -249,36 +209,7 @@ export default function Inicio() {
 
           <div className="produtos">
             {produtosFiltrados.length > 0 ? (
-              produtosFiltrados.map((item, index) => (
-                <div
-                  key={`${item.id}-${index}`}
-                  className="card-wrapper"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center"
-                  }}
-                >
-                  <Link
-                    to={`/produto/${item.id}`}
-                    className="card-link"
-                    style={{
-                      textDecoration: "none",
-                      color: "inherit",
-                      width: "100%"
-                    }}
-                  >
-                    <div className="card">
-                      <img src={item.img} alt={item.nome} />
-                      <p className="nome">{item.nome}</p>
-                      <p className="preco-antigo">
-                        <del>{item.precoAntigo}</del>
-                      </p>
-                      <p className="preco">{item.preco}</p>
-                    </div>
-                  </Link>
-                </div>
-              ))
+              produtosFiltrados.map(renderCard)
             ) : (
               <p style={{ textAlign: "center", width: "100%", color: "#666", gridColumn: "1 / -1" }}>
                 Nenhum produto encontrado.
@@ -287,86 +218,22 @@ export default function Inicio() {
           </div>
         </>
       ) : (
-        // EXIBE A HOME PADRÃO COM AS FILEIRAS
         <>
-          {/* PRIMEIRA FILEIRA */}
-          <h2 className="titulo-fileira">
-            Coleção Nana & Mimi 
-          </h2>
-
+          <h2 className="titulo-fileira">Coleção Nana & Mimi</h2>
           <div className="produtos">
-            {listaProdutos.slice(0, 4).map((item, index) => (
-              <div
-                key={`${item.id}-${index}`}
-                className="card-wrapper"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center"
-                }}
-              >
-                <Link
-                  to={`/produto/${item.id}`}
-                  className="card-link"
-                  style={{
-                    textDecoration: "none",
-                    color: "inherit",
-                    width: "100%"
-                  }}
-                >
-                  <div className="card">
-                    <img src={item.img} alt={item.nome} />
-                    <p className="nome">{item.nome}</p>
-                    <p className="preco-antigo">
-                      <del>{item.precoAntigo}</del>
-                    </p>
-                    <p className="preco">{item.preco}</p>
-                  </div>
-                </Link>
-              </div>
-            ))}
+            {produtos.slice(0, 4).map(renderCard)}
           </div>
 
-          {/* SEGUNDA FILEIRA */}
-          <h2 className="titulo-fileira">
-            Conforto & Estilo
-          </h2>
-
-          <div className="produtos">
-            {listaProdutos.slice(4, 8).map((item, index) => (
-              <div
-                key={`${item.id}-${index}`}
-                className="card-wrapper"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center"
-                }}
-              >
-                <Link
-                  to={`/produto/${item.id}`}
-                  className="card-link"
-                  style={{
-                    textDecoration: "none",
-                    color: "inherit",
-                    width: "100%"
-                  }}
-                >
-                  <div className="card">
-                    <img src={item.img} alt={item.nome} />
-                    <p className="nome">{item.nome}</p>
-                    <p className="preco-antigo">
-                      <del>{item.precoAntigo}</del>
-                    </p>
-                    <p className="preco">{item.preco}</p>
-                  </div>
-                </Link>
+          {produtos.length > 4 && (
+            <>
+              <h2 className="titulo-fileira">Conforto & Estilo</h2>
+              <div className="produtos">
+                {produtos.slice(4, 8).map(renderCard)}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </>
       )}
-
     </div>
   );
 }

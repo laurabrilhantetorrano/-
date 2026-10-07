@@ -1,11 +1,6 @@
 // ─── Configuração da API ─────────────────────────────────────
-// URL base da API, configurável via variável de ambiente
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
 
-/**
- * Função auxiliar para fazer requisições à API.
- * Adiciona automaticamente o token JWT se disponível.
- */
 export async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('token');
 
@@ -16,35 +11,51 @@ export async function apiFetch(endpoint, options = {}) {
     },
   };
 
-  // Adiciona Content-Type JSON se não for FormData
   if (!(options.body instanceof FormData)) {
     config.headers['Content-Type'] = 'application/json';
   }
 
-  // Adiciona o token de autenticação
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, config);
-  const data = await response.json();
+  const response = await fetch(`${API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`, config);
+
+  let data = {};
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    data = await response.text();
+  }
 
   if (!response.ok) {
-    throw { status: response.status, ...data };
+    throw {
+      status: response.status,
+      ...(typeof data === 'object' ? data : { erro: data }),
+    };
   }
 
   return data;
 }
 
-/**
- * Formata um valor numérico para moeda brasileira (R$ 105,00)
- */
 export function formatarPreco(valor) {
   const num = Number(valor);
-  if (isNaN(num)) return 'R$ 0,00';
-  const parts = num.toFixed(2).split('.');
-  const inteiro = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return `R$ ${inteiro},${parts[1]}`;
+  if (Number.isNaN(num)) return 'R$ 0,00';
+
+  return num.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+}
+
+export function normalizarImagem(url) {
+  if (!url) return null;
+  if (url.startsWith('http://back-ahgw.onrender.com')) {
+    return url.replace('http://', 'https://');
+  }
+  return url;
 }
 
 export { API_URL };

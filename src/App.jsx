@@ -8,6 +8,7 @@ import { CarrinhoProvider } from './CarrinhoContext';
 import { AuthProvider } from './AuthContext';
 import SobreNos from './SobreNos';
 import Contato from './Contato';
+import MinhaConta from './MinhaConta';
 import Footer from './Footer';
 
 function FooterCondicional() {
@@ -31,6 +32,7 @@ function App() {
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/produto/:id" element={<Produto />} />
             <Route path="/carrinho" element={<Carrinho />} />
+            <Route path="/minha-conta" element={<MinhaConta />} />
             <Route path="/sobre-nos" element={<SobreNos />} />
             <Route path="/contato" element={<Contato />} />
           </Routes>

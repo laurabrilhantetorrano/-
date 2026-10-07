@@ -5,65 +5,77 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [carregando, setCarregando] = useState(true);
 
-  // Ao montar ou quando o token mudar, busca os dados do usuário
   useEffect(() => {
-    if (token) {
-      apiFetch('/auth/me')
-        .then((data) => {
-          setUsuario(data);
-        })
-        .catch(() => {
-          // Token inválido ou expirado
-          localStorage.removeItem('token');
+    let ativo = true;
+
+    async function carregarUsuario() {
+      if (!token) {
+        if (ativo) {
+          setUsuario(null);
+          setCarregando(false);
+        }
+        return;
+      }
+
+      setCarregando(true);
+
+      try {
+        const data = await apiFetch('/auth/me');
+        if (ativo) setUsuario(data);
+      } catch {
+        localStorage.removeItem('token');
+        if (ativo) {
           setToken(null);
           setUsuario(null);
-        })
-        .finally(() => setCarregando(false));
-    } else {
-      setCarregando(false);
+        }
+      } finally {
+        if (ativo) setCarregando(false);
+      }
     }
+
+    carregarUsuario();
+
+    return () => {
+      ativo = false;
+    };
   }, [token]);
 
-  // Login de cliente
+  const salvarSessao = (data) => {
+    localStorage.setItem('token', data.token);
+    setToken(data.token);
+    setUsuario(data.usuario);
+  };
+
   const login = async (email, senha) => {
     const data = await apiFetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, senha }),
     });
-    localStorage.setItem('token', data.token);
-    setToken(data.token);
-    setUsuario(data.usuario);
+    salvarSessao(data);
     return data;
   };
 
-  // Cadastro de cliente
   const cadastrar = async (nome, email, senha) => {
     const data = await apiFetch('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ nome, email, senha }),
     });
-    localStorage.setItem('token', data.token);
-    setToken(data.token);
-    setUsuario(data.usuario);
+    salvarSessao(data);
     return data;
   };
 
-  // Login de funcionário
   const loginFuncionario = async (email, senha) => {
     const data = await apiFetch('/employees/login', {
       method: 'POST',
       body: JSON.stringify({ email, senha }),
     });
-    localStorage.setItem('token', data.token);
-    setToken(data.token);
-    setUsuario(data.usuario);
+    salvarSessao(data);
     return data;
   };
 
-  // Logout
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
