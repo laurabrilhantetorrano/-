@@ -33,12 +33,6 @@ export default function Navbar() {
         onSubmit={(e) => {
           e.preventDefault();
           const termo = e.currentTarget.elements.busca.value.trim();
-
-          if (window.location.pathname === "/" && !termo) {
-            navigate("/");
-            return;
-          }
-
           navigate(termo ? `/?busca=${encodeURIComponent(termo)}` : "/");
         }}
       >
