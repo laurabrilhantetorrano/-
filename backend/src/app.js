@@ -1,4 +1,8 @@
 require('dotenv').config();
+
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️ JWT_SECRET não definido. Configure JWT_SECRET no ambiente do backend.');
+}
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
