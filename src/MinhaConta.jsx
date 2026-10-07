@@ -7,7 +7,7 @@ import { formatarPreco } from "./api";
 import "./MinhaConta.css";
 
 export default function MinhaConta() {
-  const { usuario, logout, isCliente } = useAuth();
+  const { usuario, logout, isCliente, isAdministrador } = useAuth();
   const { carrinho } = useCarrinho();
   const navigate = useNavigate();
 
@@ -86,6 +86,20 @@ export default function MinhaConta() {
             </div>
           )}
         </div>
+
+        {isAdministrador && (
+          <>
+            <div className="conta-divisor" />
+            <Link to="/admin/produtos" className="conta-carrinho-card conta-admin-card">
+              <div className="conta-carrinho-icone">🛍️</div>
+              <div className="conta-carrinho-info">
+                <strong>Área de administração</strong>
+                <span>Cadastrar, editar e desativar produtos</span>
+              </div>
+              <span className="conta-carrinho-seta">→</span>
+            </Link>
+          </>
+        )}
 
         {isCliente && (
           <>

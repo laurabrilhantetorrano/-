@@ -8,8 +8,27 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 require('./database/database');
+
+// Garante que o e-mail oficial da Nana & Mimi tenha uma conta de administrador.
+function garantirAdministradorOficial() {
+  const db = require('./database/database');
+  const email = (process.env.NANA_MIMI_ADMIN_EMAIL || 'nanaemimimodainfantil@gmail.com').toLowerCase();
+  const senha = process.env.NANA_MIMI_ADMIN_PASSWORD || 'NanaMimi123';
+  const existente = db.prepare('SELECT id FROM funcionarios WHERE email = ?').get(email);
+
+  if (!existente) {
+    const senhaHash = bcrypt.hashSync(senha, 10);
+    db.prepare(
+      'INSERT INTO funcionarios (nome, email, senha, cargo) VALUES (?, ?, ?, ?)'
+    ).run('Nana & Mimi', email, senhaHash, 'admin');
+    console.log(`🔐 Administrador oficial criado: ${email}`);
+  }
+}
+
+garantirAdministradorOficial();
 
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
@@ -18,8 +37,9 @@ const cartRoutes = require('./routes/cartRoutes');
 
 const app = express();
 
-// O Render fica atrás de um proxy HTTPS. Isso faz req.protocol reconhecer https.
+// Render fica atrás de um proxy HTTPS. Isso faz req.protocol reconhecer HTTPS.
 app.set('trust proxy', 1);
+
 
 const allowedOrigins = [
   'http://localhost:5173',

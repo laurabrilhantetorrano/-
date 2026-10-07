@@ -50,10 +50,19 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, senha) => {
-    const data = await apiFetch('/auth/login', {
+    const emailNormalizado = String(email || '').trim().toLowerCase();
+    const emailAdministrador = 'nanaemimimodainfantil@gmail.com';
+
+    // O e-mail oficial da Nana & Mimi entra pela conta de funcionário/admin.
+    const endpoint = emailNormalizado === emailAdministrador
+      ? '/employees/login'
+      : '/auth/login';
+
+    const data = await apiFetch(endpoint, {
       method: 'POST',
-      body: JSON.stringify({ email, senha }),
+      body: JSON.stringify({ email: emailNormalizado, senha }),
     });
+
     salvarSessao(data);
     return data;
   };
@@ -85,6 +94,7 @@ export function AuthProvider({ children }) {
   const isLogado = !!usuario;
   const isFuncionario = usuario?.tipo === 'funcionario';
   const isCliente = usuario?.tipo === 'cliente';
+  const isAdministrador = isFuncionario && (usuario?.cargo === 'admin' || String(usuario?.email || '').toLowerCase() === 'nanaemimimodainfantil@gmail.com');
 
   return (
     <AuthContext.Provider
@@ -99,6 +109,7 @@ export function AuthProvider({ children }) {
         isLogado,
         isFuncionario,
         isCliente,
+        isAdministrador,
       }}
     >
       {children}

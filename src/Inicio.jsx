@@ -1,21 +1,19 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import { CircleUserRound, ShoppingCart, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import "swiper/css";
 import React, { useEffect, useState } from "react";
 import "./Inicio.css";
 import { useCarrinho } from "./CarrinhoContext";
-import { useAuth } from "./AuthContext";
 import { apiFetch, formatarPreco, normalizarImagem } from "./api";
 
 import slider1 from "./assets/slider1.png";
 import slider2 from "./assets/slider2.png";
-import logo from "./assets/logo.jpg";
+import Navbar from "./Navbar";
 
 export default function Inicio() {
   const { carrinho } = useCarrinho();
-  const { usuario, isLogado } = useAuth();
   const [termoBusca, setTermoBusca] = useState("");
   const [produtos, setProdutos] = useState([]);
   const [carregandoProdutos, setCarregandoProdutos] = useState(true);
@@ -96,57 +94,7 @@ export default function Inicio() {
 
   return (
     <div className="app">
-      <div className="navbar">
-        <Link to="/" className="logo-link" aria-label="Nana & Mimi">
-          <img src={logo} alt="Nana & Mimi" className="logo" />
-        </Link>
-
-        <div className="menu">
-          <Link to="/sobre-nos">
-            <span>Sobre nós</span>
-          </Link>
-
-          <Link to="/contato">
-            <span>Contato</span>
-          </Link>
-
-          <Link to="/">
-            <span>Roupas</span>
-          </Link>
-        </div>
-
-        <div className="container-pesquisa">
-          <input
-            type="text"
-            placeholder="Buscar produto..."
-            className="input-pesquisa"
-            value={termoBusca}
-            onChange={(e) => setTermoBusca(e.target.value)}
-          />
-          <Search size={19} className="icone-lupa" />
-        </div>
-
-        <div className="acoes-navbar">
-          <Link
-            to={isLogado ? "/minha-conta" : "/login"}
-            className="conta-navbar"
-            title={isLogado ? "Minha conta" : "Entrar"}
-          >
-            <CircleUserRound size={30} />
-            <span className="conta-textos">
-              <strong>{isLogado ? usuario?.nome || "Olá!" : "Entrar"}</strong>
-              <small>Minha conta</small>
-            </span>
-          </Link>
-
-          <Link to="/carrinho" className="carrinho-navbar" title="Carrinho">
-            <ShoppingCart size={30} />
-            {totalItens > 0 && (
-              <span className="contador-carrinho">{totalItens}</span>
-            )}
-          </Link>
-        </div>
-      </div>
+      <Navbar />
 
       <div className="banner">
         <Swiper

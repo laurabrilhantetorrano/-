@@ -2,7 +2,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
 const { listar, buscarPorId, criar, atualizar, deletar } = require('../controllers/productController');
-const { autenticarFuncionario } = require('../middleware/auth');
+const { autenticarAdministrador } = require('../middleware/auth');
 
 // Configuração do Multer para upload de imagens
 const storage = multer.diskStorage({
@@ -35,8 +35,8 @@ router.get('/', listar);
 router.get('/:id', buscarPorId);
 
 // Rotas protegidas (somente funcionários)
-router.post('/', autenticarFuncionario, upload.single('imagem'), criar);
-router.put('/:id', autenticarFuncionario, upload.single('imagem'), atualizar);
-router.delete('/:id', autenticarFuncionario, deletar);
+router.post('/', autenticarAdministrador, upload.single('imagem'), criar);
+router.put('/:id', autenticarAdministrador, upload.single('imagem'), atualizar);
+router.delete('/:id', autenticarAdministrador, deletar);
 
 module.exports = router;

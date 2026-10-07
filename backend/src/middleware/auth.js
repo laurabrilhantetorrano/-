@@ -46,4 +46,36 @@ function autenticarFuncionario(req, res, next) {
   }
 }
 
-module.exports = { autenticarToken, autenticarFuncionario };
+
+/**
+ * Proteção da área de produtos.
+ * Além de funcionários, o cargo admin e o e-mail oficial da Nana & Mimi
+ * são tratados como administradores.
+ */
+function autenticarAdministrador(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ erro: 'Token de autenticação não fornecido.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const emailAdmin = (process.env.NANA_MIMI_ADMIN_EMAIL || 'nanaemimimodainfantil@gmail.com').toLowerCase();
+
+    if (
+      decoded.tipo !== 'funcionario' ||
+      (decoded.cargo !== 'admin' && String(decoded.email || '').toLowerCase() !== emailAdmin)
+    ) {
+      return res.status(403).json({ erro: 'Acesso restrito ao administrador da Nana & Mimi.' });
+    }
+
+    req.usuario = decoded;
+    next();
+  } catch (err) {
+    return res.status(403).json({ erro: 'Token inválido ou expirado.' });
+  }
+}
+
+module.exports = { autenticarToken, autenticarFuncionario, autenticarAdministrador };
