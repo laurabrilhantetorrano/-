@@ -25,7 +25,8 @@ function FooterCondicional() {
 
 function App() {
   return (
-    <AuthProvider>
+    <AdminErrorBoundary>
+      <AuthProvider>
       <CarrinhoProvider>
         <BrowserRouter>
           <Routes>
@@ -35,7 +36,7 @@ function App() {
             <Route path="/produto/:id" element={<Produto />} />
             <Route path="/carrinho" element={<Carrinho />} />
             <Route path="/minha-conta" element={<MinhaConta />} />
-            <Route path="/admin/produtos" element={<AdminErrorBoundary><AdminProdutos /></AdminErrorBoundary>} />
+            <Route path="/admin/produtos" element={<AdminProdutos />} />
             <Route path="/sobre-nos" element={<SobreNos />} />
             <Route path="/contato" element={<Contato />} />
           </Routes>
@@ -43,6 +44,7 @@ function App() {
         </BrowserRouter>
       </CarrinhoProvider>
     </AuthProvider>
+    </AdminErrorBoundary>
   );
 }
 

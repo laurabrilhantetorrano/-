@@ -37,7 +37,7 @@ export default function Navbar() {
             }
           }}
         />
-        <Search size={19} />
+        <span className="site-navbar-search-icon" aria-hidden="true"><Search size={19} strokeWidth={2} /></span>
       </div>
 
       <div className="site-navbar-actions">
