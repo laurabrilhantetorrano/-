@@ -1,1 +1,6 @@
-VITE_API_URL=https://back-ahgw.onrender.com
+PORT=3001
+JWT_SECRET=coloque-uma-chave-secreta-aqui
+FRONTEND_URL=https://seu-projeto.vercel.app
+PUBLIC_API_URL=https://back-ahgw.onrender.com
+NANA_MIMI_ADMIN_EMAIL=nanaemimimodainfantil@gmail.com
+NANA_MIMI_ADMIN_PASSWORD=NanaMimi123

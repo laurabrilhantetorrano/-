@@ -112,7 +112,30 @@ export default function AdminProdutos() {
     }
   };
 
-  if (carregando || !isAdministrador) return null;
+  if (carregando) {
+    return (
+      <div className="admin-pagina">
+        <Navbar />
+        <main className="admin-container admin-estado">
+          <h1>Carregando área administrativa...</h1>
+          <p>Aguarde enquanto verificamos sua conta.</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (!isAdministrador) {
+    return (
+      <div className="admin-pagina">
+        <Navbar />
+        <main className="admin-container admin-estado">
+          <h1>Acesso restrito</h1>
+          <p>Esta área é exclusiva para o administrador da Nana & Mimi.</p>
+          <Link to="/minha-conta" className="admin-voltar">Voltar para minha conta</Link>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-pagina">

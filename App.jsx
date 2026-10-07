@@ -11,6 +11,7 @@ import Contato from './Contato';
 import MinhaConta from './MinhaConta';
 import Footer from './Footer';
 import AdminProdutos from './AdminProdutos';
+import AdminErrorBoundary from './AdminErrorBoundary';
 
 function FooterCondicional() {
   const location = useLocation();
@@ -34,7 +35,7 @@ function App() {
             <Route path="/produto/:id" element={<Produto />} />
             <Route path="/carrinho" element={<Carrinho />} />
             <Route path="/minha-conta" element={<MinhaConta />} />
-            <Route path="/admin/produtos" element={<AdminProdutos />} />
+            <Route path="/admin/produtos" element={<AdminErrorBoundary><AdminProdutos /></AdminErrorBoundary>} />
             <Route path="/sobre-nos" element={<SobreNos />} />
             <Route path="/contato" element={<Contato />} />
           </Routes>
