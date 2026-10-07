@@ -15,7 +15,7 @@ import logo from "./assets/logo.jpg";
 
 export default function Inicio() {
   const { carrinho } = useCarrinho();
-  const { isLogado } = useAuth();
+  const { usuario, isLogado } = useAuth();
   const [termoBusca, setTermoBusca] = useState("");
   const [produtos, setProdutos] = useState([]);
   const [carregandoProdutos, setCarregandoProdutos] = useState(true);
@@ -27,16 +27,21 @@ export default function Inicio() {
     async function carregarProdutos() {
       try {
         setCarregandoProdutos(true);
-        const data = await apiFetch('/products');
+        const data = await apiFetch("/products");
 
         if (ativo) {
-          setProdutos((data || []).map((produto) => ({
-            ...produto,
-            id: Number(produto.id),
-            preco: Number(produto.preco),
-            preco_antigo: produto.preco_antigo == null ? null : Number(produto.preco_antigo),
-            imagem: normalizarImagem(produto.imagem),
-          })));
+          setProdutos(
+            (data || []).map((produto) => ({
+              ...produto,
+              id: Number(produto.id),
+              preco: Number(produto.preco),
+              preco_antigo:
+                produto.preco_antigo == null
+                  ? null
+                  : Number(produto.preco_antigo),
+              imagem: normalizarImagem(produto.imagem),
+            }))
+          );
           setErroProdutos("");
         }
       } catch (erro) {
@@ -60,41 +65,27 @@ export default function Inicio() {
   );
 
   const produtosFiltrados = produtos.filter((produto) =>
-    String(produto.nome || "").toLowerCase().includes(termoBusca.toLowerCase())
+    String(produto.nome || "")
+      .toLowerCase()
+      .includes(termoBusca.toLowerCase())
   );
 
   const renderCard = (item) => (
-    <div
-      key={item.id}
-      className="card-wrapper"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center"
-      }}
-    >
-      <Link
-        to={`/produto/${item.id}`}
-        className="card-link"
-        style={{
-          textDecoration: "none",
-          color: "inherit",
-          width: "100%"
-        }}
-      >
+    <div key={item.id} className="card-wrapper">
+      <Link to={`/produto/${item.id}`} className="card-link">
         <div className="card">
           {item.imagem ? (
             <img src={item.imagem} alt={item.nome} />
           ) : (
-            <div style={{ height: 250, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              Sem imagem
-            </div>
+            <div className="imagem-sem-produto">Imagem indisponível</div>
           )}
 
           <p className="nome">{item.nome}</p>
 
           <p className="preco-antigo">
-            {item.preco_antigo ? <del>{formatarPreco(item.preco_antigo)}</del> : null}
+            {item.preco_antigo ? (
+              <del>{formatarPreco(item.preco_antigo)}</del>
+            ) : null}
           </p>
 
           <p className="preco">{formatarPreco(item.preco)}</p>
@@ -106,20 +97,20 @@ export default function Inicio() {
   return (
     <div className="app">
       <div className="navbar">
-        <Link to="/">
-          <img src={logo} alt="Logo" className="logo" />
+        <Link to="/" className="logo-link" aria-label="Nana & Mimi">
+          <img src={logo} alt="Nana & Mimi" className="logo" />
         </Link>
 
         <div className="menu">
-          <Link to="/sobre-nos" style={{ textDecoration: "none", color: "inherit" }}>
+          <Link to="/sobre-nos">
             <span>Sobre nós</span>
           </Link>
 
-          <Link to="/contato" style={{ textDecoration: "none", color: "inherit" }}>
+          <Link to="/contato">
             <span>Contato</span>
           </Link>
 
-          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+          <Link to="/">
             <span>Roupas</span>
           </Link>
         </div>
@@ -132,40 +123,26 @@ export default function Inicio() {
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
           />
-          <Search size={18} className="icone-lupa" />
+          <Search size={19} className="icone-lupa" />
         </div>
 
-        <div className="icons">
+        <div className="acoes-navbar">
           <Link
             to={isLogado ? "/minha-conta" : "/login"}
-            style={{ color: "inherit" }}
+            className="conta-navbar"
             title={isLogado ? "Minha conta" : "Entrar"}
           >
             <CircleUserRound size={30} />
+            <span className="conta-textos">
+              <strong>{isLogado ? usuario?.nome || "Olá!" : "Entrar"}</strong>
+              <small>Minha conta</small>
+            </span>
           </Link>
 
-          <Link
-            to="/carrinho"
-            style={{ color: "inherit", position: "relative" }}
-          >
+          <Link to="/carrinho" className="carrinho-navbar" title="Carrinho">
             <ShoppingCart size={30} />
-
             {totalItens > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-5px",
-                  right: "-8px",
-                  background: "#ff3b30",
-                  color: "white",
-                  borderRadius: "50%",
-                  padding: "2px 6px",
-                  fontSize: "11px",
-                  fontWeight: "bold"
-                }}
-              >
-                {totalItens}
-              </span>
+              <span className="contador-carrinho">{totalItens}</span>
             )}
           </Link>
         </div>
@@ -176,14 +153,14 @@ export default function Inicio() {
           modules={[Autoplay]}
           slidesPerView={1}
           autoplay={{ delay: 3000 }}
-          loop={true}
+          loop
         >
           <SwiperSlide>
-            <img src={slider1} alt="slider1" />
+            <img src={slider1} alt="Moda Nana & Mimi" />
           </SwiperSlide>
 
           <SwiperSlide>
-            <img src={slider2} alt="slider2" />
+            <img src={slider2} alt="Moda Nana & Mimi" />
           </SwiperSlide>
         </Swiper>
       </div>
@@ -196,11 +173,9 @@ export default function Inicio() {
       </div>
 
       {carregandoProdutos ? (
-        <p style={{ textAlign: "center", padding: "40px" }}>Carregando produtos...</p>
+        <p className="mensagem-produtos">Carregando produtos...</p>
       ) : erroProdutos ? (
-        <p style={{ textAlign: "center", padding: "40px", color: "#b00020" }}>
-          {erroProdutos}
-        </p>
+        <p className="mensagem-produtos erro">{erroProdutos}</p>
       ) : termoBusca.trim() !== "" ? (
         <>
           <h2 className="titulo-fileira">
@@ -211,9 +186,7 @@ export default function Inicio() {
             {produtosFiltrados.length > 0 ? (
               produtosFiltrados.map(renderCard)
             ) : (
-              <p style={{ textAlign: "center", width: "100%", color: "#666", gridColumn: "1 / -1" }}>
-                Nenhum produto encontrado.
-              </p>
+              <p className="nenhum-produto">Nenhum produto encontrado.</p>
             )}
           </div>
         </>

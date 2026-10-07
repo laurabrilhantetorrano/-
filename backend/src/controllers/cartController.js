@@ -44,7 +44,7 @@ function obterCarrinho(req, res) {
     }
 
     const carrinho = obterOuCriarCarrinho(userId);
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     const itens = montarItensCarrinho(carrinho.id, baseUrl);
 
     res.json({ itens });
@@ -104,7 +104,7 @@ function adicionarItem(req, res) {
     }
 
     // Retorna carrinho atualizado
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     const itens = montarItensCarrinho(carrinho.id, baseUrl);
     res.json({ mensagem: 'Produto adicionado ao carrinho!', itens });
   } catch (err) {
@@ -157,7 +157,7 @@ function atualizarItem(req, res) {
       'UPDATE carrinho_itens SET quantidade = ? WHERE id = ?'
     ).run(quantidade, item.id);
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     const itens = montarItensCarrinho(carrinho.id, baseUrl);
     res.json({ mensagem: 'Quantidade atualizada!', itens });
   } catch (err) {
@@ -188,7 +188,7 @@ function removerItem(req, res) {
 
     db.prepare('DELETE FROM carrinho_itens WHERE id = ?').run(item.id);
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     const itens = montarItensCarrinho(carrinho.id, baseUrl);
     res.json({ mensagem: 'Item removido do carrinho.', itens });
   } catch (err) {

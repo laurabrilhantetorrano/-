@@ -34,7 +34,7 @@ function listar(req, res) {
     const produtos = db.prepare(query).all(...params);
 
     // Monta a URL completa da imagem
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     const produtosComUrl = produtos.map(p => ({
       ...p,
       imagem: p.imagem ? `${baseUrl}/uploads/${p.imagem}` : null
@@ -56,7 +56,7 @@ function buscarPorId(req, res) {
       return res.status(404).json({ erro: 'Produto não encontrado.' });
     }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     produto.imagem = produto.imagem ? `${baseUrl}/uploads/${produto.imagem}` : null;
 
     res.json(produto);
@@ -99,7 +99,7 @@ function criar(req, res) {
     );
 
     const novoProduto = db.prepare('SELECT * FROM produtos WHERE id = ?').get(result.lastInsertRowid);
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     novoProduto.imagem = novoProduto.imagem ? `${baseUrl}/uploads/${novoProduto.imagem}` : null;
 
     res.status(201).json({
@@ -141,7 +141,7 @@ function atualizar(req, res) {
     `).run(nome, descricao, preco, preco_antigo, categoria, tamanhos, cor, imagem, estoque, ativo, id);
 
     const atualizado = db.prepare('SELECT * FROM produtos WHERE id = ?').get(id);
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`;
     atualizado.imagem = atualizado.imagem ? `${baseUrl}/uploads/${atualizado.imagem}` : null;
 
     res.json({

@@ -1,25 +1,28 @@
-NANA & MIMI - INTEGRACAO FRONTEND + BACKEND
+NANA & MIMI — VERSÃO INTEGRADA
 
-FRONTEND (Vercel)
-Configure:
+O que foi corrigido nesta versão:
+- Imagens dos 8 produtos originais voltaram a aparecer usando os arquivos que já estão em src/assets.
+- Produtos continuam vindo do backend /products.
+- Carrinho continua vinculado ao usuário e salvo no backend.
+- Botão "Finalizar compra" agora abre a etapa "Completar pedido".
+- A etapa de checkout pede nome, e-mail, telefone, endereço e forma de pagamento.
+- Ao confirmar, o carrinho é limpo e aparece uma confirmação. É uma simulação para o TCC; não existe gateway de pagamento real.
+- Minha conta ganhou layout novo, dados do usuário e botão "Sair da conta" com texto.
+- No topo da loja, o ícone de login agora mostra o nome do usuário e "Minha conta" quando conectado.
+- URLs de imagens do Render são normalizadas para HTTPS.
+- Para os produtos originais, o frontend usa as imagens locais quando o Render ainda não tiver o arquivo em /uploads.
+
+CONFIGURAÇÃO DO VERCEL
+Mantenha:
 VITE_API_URL=https://back-ahgw.onrender.com
-Depois faça um novo deploy.
 
-BACKEND (Render)
-A pasta backend/ contém o backend atualizado. O package.json inclui multer.
-Mantenha no Render:
-JWT_SECRET=uma-chave-secreta-forte
-FRONTEND_URL=https://1fjstwfyh-35hecb1pr-laurabrilhante1.vercel.app
+Não coloque barra / no final.
 
-INTEGRADO
-- Produtos da página inicial vêm de /products.
-- Página de produto vem de /products/:id.
-- Cadastro/login salvam o JWT.
-- Minha conta mostra nome, e-mail e tipo.
-- Carrinho usa /cart e fica vinculado ao usuário.
-- Adicionar, remover e alterar quantidade usam o backend.
-- O botão da conta abre /minha-conta quando logado.
-- Imagens do Render são tratadas para HTTPS.
-- CORS aceita os domínios Vercel conhecidos e previews vercel.app.
+CONFIGURAÇÃO OPCIONAL DO RENDER
+Pode adicionar:
+PUBLIC_API_URL=https://back-ahgw.onrender.com
 
-Não coloque um .env real no GitHub. Use as variáveis do Vercel/Render.
+Depois de substituir os arquivos:
+1. Faça commit/push do frontend.
+2. Faça um novo deploy no Vercel.
+3. Se alterar o backend, faça commit/push no repositório do backend e aguarde o Render redeployar.
