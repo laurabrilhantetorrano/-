@@ -11,7 +11,6 @@ import Contato from './Contato';
 import MinhaConta from './MinhaConta';
 import Footer from './Footer';
 import AdminProdutos from './AdminProdutos';
-import AdminErrorBoundary from './AdminErrorBoundary';
 
 function FooterCondicional() {
   const location = useLocation();
@@ -25,8 +24,7 @@ function FooterCondicional() {
 
 function App() {
   return (
-    <AdminErrorBoundary>
-      <AuthProvider>
+    <AuthProvider>
       <CarrinhoProvider>
         <BrowserRouter>
           <Routes>
@@ -44,7 +42,6 @@ function App() {
         </BrowserRouter>
       </CarrinhoProvider>
     </AuthProvider>
-    </AdminErrorBoundary>
   );
 }
 

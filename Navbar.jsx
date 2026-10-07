@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { CircleUserRound, ShoppingCart, Search } from "lucide-react";
+import React from "react";
+import { CircleUserRound, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { useCarrinho } from "./CarrinhoContext";
@@ -8,20 +8,13 @@ import "./Navbar.css";
 
 export default function Navbar() {
   const { usuario, isLogado } = useAuth();
-  const { carrinho } = useCarrinho();
   const navigate = useNavigate();
-  const [busca, setBusca] = useState("");
+  const { carrinho } = useCarrinho();
 
   const totalItens = carrinho.reduce(
     (total, item) => total + Number(item.quantidade || 0),
     0
   );
-
-  function pesquisar(e) {
-    e?.preventDefault();
-    const termo = busca.trim();
-    navigate(termo ? `/?busca=${encodeURIComponent(termo)}` : "/");
-  }
 
   return (
     <header className="site-navbar">
@@ -35,17 +28,29 @@ export default function Navbar() {
         <Link to="/">Roupas</Link>
       </nav>
 
-      <form className="site-navbar-search" onSubmit={pesquisar} role="search">
+      <form
+        className="site-navbar-search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const termo = e.currentTarget.elements.busca.value.trim();
+
+          if (window.location.pathname === "/" && !termo) {
+            navigate("/");
+            return;
+          }
+
+          navigate(termo ? `/?busca=${encodeURIComponent(termo)}` : "/");
+        }}
+      >
         <input
+          name="busca"
           type="search"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar produto..."
+          defaultValue={
+            new URLSearchParams(window.location.search).get("busca") || ""
+          }
           aria-label="Buscar produto"
         />
-        <button type="submit" className="site-navbar-search-button" aria-label="Pesquisar">
-          <Search size={19} strokeWidth={2} />
-        </button>
       </form>
 
       <div className="site-navbar-actions">
@@ -63,7 +68,9 @@ export default function Navbar() {
 
         <Link to="/carrinho" className="site-navbar-cart" title="Carrinho">
           <ShoppingCart size={30} />
-          {totalItens > 0 && <b>{totalItens}</b>}
+          {totalItens > 0 && (
+            <b>{totalItens}</b>
+          )}
         </Link>
       </div>
     </header>

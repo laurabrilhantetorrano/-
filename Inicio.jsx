@@ -1,11 +1,9 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import { Search } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import "swiper/css";
 import React, { useEffect, useState } from "react";
 import "./Inicio.css";
-import { useCarrinho } from "./CarrinhoContext";
 import { apiFetch, formatarPreco, normalizarImagem } from "./api";
 
 import slider1 from "./assets/slider1.png";
@@ -13,16 +11,11 @@ import slider2 from "./assets/slider2.png";
 import Navbar from "./Navbar";
 
 export default function Inicio() {
-  const { carrinho } = useCarrinho();
   const [searchParams] = useSearchParams();
-  const [termoBusca, setTermoBusca] = useState(() => searchParams.get("busca") || "");
+  const termoBusca = searchParams.get("busca") || "";
   const [produtos, setProdutos] = useState([]);
   const [carregandoProdutos, setCarregandoProdutos] = useState(true);
   const [erroProdutos, setErroProdutos] = useState("");
-
-  useEffect(() => {
-    setTermoBusca(searchParams.get("busca") || "");
-  }, [searchParams]);
 
   useEffect(() => {
     let ativo = true;
@@ -62,10 +55,6 @@ export default function Inicio() {
     };
   }, []);
 
-  const totalItens = carrinho.reduce(
-    (acc, item) => acc + Number(item.quantidade || 0),
-    0
-  );
 
   const produtosFiltrados = produtos.filter((produto) =>
     String(produto.nome || "")
