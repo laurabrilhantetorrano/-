@@ -31,7 +31,7 @@ export default function AdminProdutos() {
 
   useEffect(() => {
     if (!carregando && !isAdministrador) navigate("/login", { replace: true });
-  }, [carregando, isFuncionario, navigate]);
+  }, [carregando, isAdministrador, navigate]);
 
   const carregar = async () => {
     try {
