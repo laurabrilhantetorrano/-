@@ -1,7 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import { Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import "swiper/css";
 import React, { useEffect, useState } from "react";
 import "./Inicio.css";
@@ -14,10 +14,15 @@ import Navbar from "./Navbar";
 
 export default function Inicio() {
   const { carrinho } = useCarrinho();
-  const [termoBusca, setTermoBusca] = useState("");
+  const [searchParams] = useSearchParams();
+  const [termoBusca, setTermoBusca] = useState(() => searchParams.get("busca") || "");
   const [produtos, setProdutos] = useState([]);
   const [carregandoProdutos, setCarregandoProdutos] = useState(true);
   const [erroProdutos, setErroProdutos] = useState("");
+
+  useEffect(() => {
+    setTermoBusca(searchParams.get("busca") || "");
+  }, [searchParams]);
 
   useEffect(() => {
     let ativo = true;
