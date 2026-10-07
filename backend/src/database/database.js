@@ -1,17 +1,13 @@
 const Database = require('better-sqlite3');
 const path = require('path');
-const fs = require('fs');
 
-// Garante que a pasta data existe
-const dataDir = path.join(__dirname, '..', '..', 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+// Caminho do banco SQLite
+// O arquivo database.sqlite fica na mesma pasta deste arquivo database.js
+const dbPath = path.join(__dirname, 'database.sqlite');
 
-const dbPath = path.join(dataDir, 'nana_mimi.db');
 const db = new Database(dbPath);
 
-// Configurações de performance
+// Configurações do SQLite
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
@@ -27,7 +23,7 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
-  -- Tabela de funcionários (separada dos clientes)
+  -- Tabela de funcionários
   CREATE TABLE IF NOT EXISTS funcionarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -54,7 +50,7 @@ db.exec(`
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
-  -- Tabela de carrinhos (um por usuário)
+  -- Tabela de carrinhos
   CREATE TABLE IF NOT EXISTS carrinhos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     usuario_id INTEGER NOT NULL UNIQUE,
